@@ -1,0 +1,43 @@
+{% extends 'portal/header.html' %}
+
+    {% block content %}
+
+    <p>I'm the search results page</p>
+
+    {% include 'portal/includes/include_test.html' %}
+
+    <div style="width: 200; height: 200">
+        <canvas id="chartCanvas"></canvas>
+    </div>
+
+    <script>
+        var chartCanvas = document.getElementById("chartCanvas").getContext("2d");
+        var bgColors = ["rgba(13, 71, 161, 1)", "rgba(183, 28, 28, 1)"];
+        var borderColors = ["rgba(13, 71, 161, 1)", "rgba(183, 28, 28, 1)"];
+
+        var analysisChart = new Chart(chartCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Positive", "Negative"],
+                datasets: [{
+                    data: {{sentiment}},
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+
+    <h3>{{qty}}</h3>
+    <h3>{{analysis}}</h3>
+    <h3>{{rate}}</h3>
+
+    {% for c in tweets %}
+        <p>{{c}}</p>
+    {% endfor %}
+
+{% endblock %}
