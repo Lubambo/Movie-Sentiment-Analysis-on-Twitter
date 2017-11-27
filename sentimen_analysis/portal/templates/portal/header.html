@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>Projeto de Sistemas</title>
+		<meta charset="utf-8" />
+		{% load staticfiles %}
+		<link rel="stylesheet" href="{% static 'personal/css/bootstrap.min.css' %}" type = "text/css"/>
+		<meta name="viewport" content = "width=device-width, initial-scale=1.0"/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+		<style type="text/css">
+			html,
+			body {
+				height:100%
+			}
+		</style>
+	</head>
+
+	<body class="body" style="background-color:#f6f6f6">
+        <form method="POST" action="/run_analysis/">
+            {% csrf_token %}
+			<input id="search_bar" type="text" placeholder="Enter movie title" name="search_bar" autocomplete="off" list="movies_list">
+			<datalist id="movies_list"></datalist>
+            <input type="submit" value="Run">
+        </form>
+
+		<script>
+			var list_of_movies = [];
+			var data_movies;
+			var search_suggestions = document.getElementById('movies_list');
+
+			$(document).ready(function(){
+				// keyup event: do something when a keyboard key is released.
+				$('#search_bar').keyup(function(){
+					var movie_title = document.getElementById("search_bar").value;
+
+					// The ajax requests are made only if something was typed.
+					if (movie_title != ''){
+						console.log(movie_title);
+
+						//setInterval(function(){}, 500);
+						$.ajax({
+							type: 'get',
+							url: '/auto_complete/',
+							data: {'movie_title': movie_title},
+							dataType: 'json',
+							success: function(data){
+
+								// The content will be displayed only if exists.
+								if (data.movies.length > 0){
+									// Emptying list of movies to repopulate.
+									list_of_movies = [];
+
+									// Populating movies list.
+									for (i = 0; i < data.movies.length; i++){
+										let movie_title = data.movies[i].title;
+										let movie_year = data.movies[i].year;
+										let movie = movie_title + " (" + movie_year + ")";
+										list_of_movies.push(movie);
+									}
+
+									// Emptying HTML datalist of movies to repopulate.
+									search_suggestions.innerHTML = '';
+
+									// Populating datalist.
+									list_of_movies.forEach(function(item){
+										let option = document.createElement('option');
+										option.value = item;
+										search_suggestions.appendChild(option);
+									});
+								}
+							}
+						});
+					}
+				});
+			});
+		</script>
+
+		{% block content %}
+		{% endblock %}
+	</body>
+
+</html>
